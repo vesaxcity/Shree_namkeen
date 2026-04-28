@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Loader2, ShoppingBag } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 
 /**
@@ -33,7 +33,7 @@ const LoginPage = () => {
       await login(email, password);
       toast.success('Welcome back! 🎉');
       navigate('/');
-    } catch (err) {
+    } catch {
       toast.error('Invalid credentials. Please try again.');
     } finally {
       setIsLoading(false);

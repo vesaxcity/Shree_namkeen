@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Loader2, ShoppingBag } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 
 /**
@@ -53,7 +53,7 @@ const RegisterPage = () => {
       });
       toast.success("Account created! Welcome to Shree's Namkeen \uD83C\uDF89");
       navigate('/');
-    } catch (err) {
+    } catch {
       toast.error('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -61,13 +61,16 @@ const RegisterPage = () => {
   };
 
   // Reusable labelled input helper
-  const Field = ({ label, icon: Icon, type = 'text', field, placeholder, required = false, suffix }) => (
+  const Field = ({ label, icon, type = 'text', field, placeholder, required = false, suffix }) => (
     <div>
       <label className="block text-sm font-semibold text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">
-        <Icon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        {React.createElement(icon, {
+          size: 18,
+          className: 'absolute left-4 top-1/2 -translate-y-1/2 text-gray-400',
+        })}
         <input
           type={type}
           placeholder={placeholder}

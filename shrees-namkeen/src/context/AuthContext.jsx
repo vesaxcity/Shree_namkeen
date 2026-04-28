@@ -1,17 +1,19 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState } from 'react';
+import { AuthContext } from './authContext';
 
-const AuthContext = createContext();
+const readStoredUser = () => {
+  const token = localStorage.getItem('authToken');
+  const userData = localStorage.getItem('userData');
 
-/**
- * useAuth — Access the global authentication context.
- * Must be used within an <AuthProvider>.
- */
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+  if (!token || !userData) return null;
+
+  try {
+    return JSON.parse(userData);
+  } catch {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    return null;
   }
-  return context;
 };
 
 /**
@@ -22,30 +24,15 @@ export const useAuth = () => {
  * are mock implementations — replace them with real API calls in Phase 3.
  */
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // On mount: rehydrate from localStorage
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('userData');
-
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-      }
-    }
-    setLoading(false);
-  }, []);
+  const [user, setUser] = useState(readStoredUser);
 
   /**
    * Mock login — accepts any email/password and creates a customer user.
    * TODO: Replace with POST /api/auth/login in Phase 3.
    */
   const login = async (email, password) => {
+    void password;
+
     const mockUser = {
       id: 1,
       name: 'Test User',
@@ -85,7 +72,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
-    loading,
+    loading: false,
     login,
     register,
     logout,

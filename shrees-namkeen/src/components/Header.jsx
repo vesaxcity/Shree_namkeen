@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   ShoppingCart, Menu, X, Search, Phone, Mail,
   User, LogOut, Home as HomeIcon,
 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/useCart';
+import { useAuth } from '../context/useAuth';
 import { categories } from '../data/products';
 
 /**
@@ -25,11 +25,6 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const debounceRef = useRef(null);
-
-  // Keep local search state in sync when URL params change externally
-  useEffect(() => {
-    setSearchQuery(searchParams.get('q') || '');
-  }, [searchParams]);
 
   /**
    * Debounced search: waits 500ms after the user stops typing,

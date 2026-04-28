@@ -4,8 +4,8 @@ import {
   MapPin, Phone, User, Mail, CreditCard, Truck,
   ChevronRight, ShieldCheck, Loader2, Package,
 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/useCart';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 
 /**
@@ -106,11 +106,14 @@ const CheckoutPage = () => {
                   { label: 'Full Name *', field: 'fullName', icon: User, placeholder: 'Rahul Sharma' },
                   { label: 'Email Address *', field: 'email', icon: Mail, placeholder: 'rahul@example.com', type: 'email' },
                   { label: 'Phone Number *', field: 'phone', icon: Phone, placeholder: '+91 98765 43210', type: 'tel', colSpan: 'sm:col-span-2' },
-                ].map(({ label, field, icon: Icon, placeholder, type = 'text', colSpan = '' }) => (
+                ].map(({ label, field, icon, placeholder, type = 'text', colSpan = '' }) => (
                   <div key={field} className={`${colSpan}`}>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">{label}</label>
                     <div className="relative">
-                      <Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      {React.createElement(icon, {
+                        size: 16,
+                        className: 'absolute left-3 top-1/2 -translate-y-1/2 text-gray-400',
+                      })}
                       <input
                         type={type}
                         placeholder={placeholder}

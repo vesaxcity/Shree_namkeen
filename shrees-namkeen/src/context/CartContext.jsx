@@ -1,18 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-
-const CartContext = createContext();
-
-/**
- * useCart — Access the global cart/wishlist/notification context.
- * Must be used within a <CartProvider>.
- */
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within CartProvider');
-  }
-  return context;
-};
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { CartContext } from './cartContext';
 
 // ── localStorage helpers ──
 
@@ -43,6 +30,19 @@ export const CartProvider = ({ children }) => {
   // ═══════════ Cart State ═══════════
   const [cart, setCart] = useState(() => readStorage(CART_KEY, []));
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const timerRef = useRef(null);
+
+  const showNotificationMessage = useCallback((message) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setNotificationMessage(message);
+    setShowNotification(true);
+    timerRef.current = setTimeout(() => {
+      setShowNotification(false);
+      timerRef.current = null;
+    }, 2000);
+  }, []);
 
   // Persist cart to localStorage on every change
   useEffect(() => {
@@ -69,13 +69,13 @@ export const CartProvider = ({ children }) => {
       showNotificationMessage('Added to cart!');
       return [...prev, { cartId, product, variant, quantity }];
     });
-  }, []); // showNotificationMessage is stable via ref
+  }, [showNotificationMessage]);
 
   /** Removes an item from the cart entirely. */
   const removeFromCart = useCallback((cartId) => {
     setCart((prev) => prev.filter((item) => item.cartId !== cartId));
     showNotificationMessage('Removed from cart');
-  }, []);
+  }, [showNotificationMessage]);
 
   /**
    * Sets the quantity of a cart item to an absolute value.
@@ -97,7 +97,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = useCallback(() => {
     setCart([]);
     showNotificationMessage('Cart cleared');
-  }, []);
+  }, [showNotificationMessage]);
 
   // ── Derived totals ──
   const cartTotal = cart.reduce((s, i) => s + i.variant.price * i.quantity, 0);
@@ -123,28 +123,7 @@ export const CartProvider = ({ children }) => {
       showNotificationMessage('Added to wishlist!');
       return [...prev, productId];
     });
-  }, []);
-
-  // ═══════════ Notification State ═══════════
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const timerRef = useRef(null);
-
-  /**
-   * Displays a temporary toast notification.
-   * Defined as a plain function (not useCallback) assigned to a ref-stable
-   * variable so it can be called from the other callbacks above without
-   * needing them in dependency arrays.
-   */
-  function showNotificationMessage(message) {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setNotificationMessage(message);
-    setShowNotification(true);
-    timerRef.current = setTimeout(() => {
-      setShowNotification(false);
-      timerRef.current = null;
-    }, 2000);
-  }
+  }, [showNotificationMessage]);
 
   // ═══════════ Value ═══════════
   const value = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, X, Plus, Minus } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/useCart';
 
 /**
  * CartSidebar — Slide-in cart drawer.
@@ -21,7 +21,6 @@ const CartSidebar = () => {
     finalTotal,
     updateQuantity,
     removeFromCart,
-    showNotificationMessage,
   } = useCart();
 
   const navigate = useNavigate();
